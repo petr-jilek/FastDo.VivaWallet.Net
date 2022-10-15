@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "FastDo.VivaWallet.Net": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:49617;http://localhost:49618"
+    }
+  }
+}
