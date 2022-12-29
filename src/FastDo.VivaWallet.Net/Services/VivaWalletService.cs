@@ -4,6 +4,7 @@ using System.Xml;
 using FastDo.VivaWallet.Net.Models.Core;
 using FastDo.VivaWallet.Net.Models.Identity;
 using FastDo.VivaWallet.Net.Models.Payments;
+using FastDo.VivaWallet.Net.Models.Subscriptions;
 using RestSharp;
 using RestSharp.Authenticators;
 
@@ -87,6 +88,46 @@ namespace FastDo.VivaWallet.Net.Services
 
             var response = await _apiRestClient.ExecuteAsync(restRequest);
             return ProcessResponse<CreatePaymentOrderResponse>(response);
+        }
+
+        public async Task<Result<AddSubscriptionResponse>> AddSubscriptionAsync(AddSubscriptionRequest requestBody)
+        {
+            if (_accessToken is null)
+                return Result<AddSubscriptionResponse>.Error("You must obtain access_token first");
+
+            var restRequest = new RestRequest(@"/checkout/v2/orders", Method.Post);
+            restRequest.RequestFormat = DataFormat.Json;
+            restRequest.AddHeader("Accept", "application/json");
+
+            var authenticator = new JwtAuthenticator(_accessToken.Token);
+            await authenticator.Authenticate(_apiRestClient, restRequest);
+
+            var jsonData = JsonSerializer.Serialize(requestBody);
+            restRequest.AddParameter("application/json", jsonData, ParameterType.RequestBody);
+
+            var response = await _apiRestClient.ExecuteAsync(restRequest);
+            return ProcessResponse<AddSubscriptionResponse>(response);
+        }
+
+        public async Task<Result<UpdateSubscriptionResponse>> UpdateSubscriptionAsync(UpdateSubscriptionRequest requestBody)
+        {
+            if (_accessToken is null)
+                return Result<UpdateSubscriptionResponse>.Error("You must obtain access_token first");
+            throw new NotImplementedException();
+        }
+
+        public async Task<Result<DeleteSubscriptionResponse>> DeleteSubscriptionAsync(string subscriptionId)
+        {
+            if (_accessToken is null)
+                return Result<DeleteSubscriptionResponse>.Error("You must obtain access_token first");
+            throw new NotImplementedException();
+        }
+
+        public async Task<Result<List<ListSubscriptionsItemResponse>>> ListSubscriptionsAsync()
+        {
+            if (_accessToken is null)
+                return Result<List<ListSubscriptionsItemResponse>>.Error("You must obtain access_token first");
+            throw new NotImplementedException();
         }
     }
 }
