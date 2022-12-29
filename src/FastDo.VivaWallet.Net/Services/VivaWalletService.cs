@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 using System.Xml;
+using FastDo.VivaWallet.Net.Helpers;
 using FastDo.VivaWallet.Net.Models.Core;
 using FastDo.VivaWallet.Net.Models.Identity;
 using FastDo.VivaWallet.Net.Models.Payments;
@@ -17,11 +18,16 @@ namespace FastDo.VivaWallet.Net.Services
         private readonly RestClient _accountsRestClient;
         private readonly RestClient _apiRestClient;
 
-        private AccessToken _accessToken;
+        private AccessToken? _accessToken;
 
         public VivaWalletService(VivaWalletServiceSettings settings)
         {
-            _settings = settings;
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+
+            if (string.IsNullOrEmpty(_settings.AccountsBaseUrl))
+                throw new ArgumentNullException(nameof(_settings));
+            if (string.IsNullOrEmpty(_settings.ApiBaseUrl))
+                throw new ArgumentNullException(nameof(_settings));
 
             _accountsRestClient = new RestClient(new Uri(_settings.AccountsBaseUrl));
             _apiRestClient = new RestClient(new Uri(_settings.ApiBaseUrl));
@@ -55,10 +61,17 @@ namespace FastDo.VivaWallet.Net.Services
 
         public async Task<Result<AccessToken>> GetAccessTokenAsync()
         {
-            var restRequest = new RestRequest(@"/connect/token", Method.Post);
-            restRequest.RequestFormat = DataFormat.Json;
+            var restRequest = new RestRequest(@"/connect/token", Method.Post)
+            {
+                RequestFormat = DataFormat.Json
+            };
             restRequest.AddHeader("Accept", "application/json");
             restRequest.AddParameter("application/x-www-form-urlencoded", "grant_type=client_credentials", ParameterType.RequestBody);
+
+            if (string.IsNullOrEmpty(_settings.ClientId))
+                throw new ArgumentNullException(nameof(_settings));
+            if (string.IsNullOrEmpty(_settings.ClientSecret))
+                throw new ArgumentNullException(nameof(_settings));
 
             var authenticator = new HttpBasicAuthenticator(_settings.ClientId, _settings.ClientSecret);
             await authenticator.Authenticate(_accountsRestClient, restRequest);
@@ -73,18 +86,13 @@ namespace FastDo.VivaWallet.Net.Services
 
         public async Task<Result<CreatePaymentOrderResponse>> CreatePaymentOrderAsync(CreatePaymentOrderRequest requestBody)
         {
-            if (_accessToken is null)
+            if (_accessToken is null || _accessToken.Token is null)
                 return Result<CreatePaymentOrderResponse>.Error("You must obtain access_token first");
 
-            var restRequest = new RestRequest(@"/checkout/v2/orders", Method.Post);
-            restRequest.RequestFormat = DataFormat.Json;
-            restRequest.AddHeader("Accept", "application/json");
+            var restRequest = RestHelper.CreateAcceptJsonPostRestRequest("/checkout/v2/orders", requestBody);
 
             var authenticator = new JwtAuthenticator(_accessToken.Token);
             await authenticator.Authenticate(_apiRestClient, restRequest);
-
-            var jsonData = JsonSerializer.Serialize(requestBody);
-            restRequest.AddParameter("application/json", jsonData, ParameterType.RequestBody);
 
             var response = await _apiRestClient.ExecuteAsync(restRequest);
             return ProcessResponse<CreatePaymentOrderResponse>(response);
@@ -92,42 +100,58 @@ namespace FastDo.VivaWallet.Net.Services
 
         public async Task<Result<AddSubscriptionResponse>> AddSubscriptionAsync(AddSubscriptionRequest requestBody)
         {
-            if (_accessToken is null)
+            if (_accessToken is null || _accessToken.Token is null)
                 return Result<AddSubscriptionResponse>.Error("You must obtain access_token first");
 
-            var restRequest = new RestRequest(@"/checkout/v2/orders", Method.Post);
-            restRequest.RequestFormat = DataFormat.Json;
-            restRequest.AddHeader("Accept", "application/json");
+            var restRequest = RestHelper.CreateAcceptJsonPostRestRequest("/dataservices/v1/webhooks/subscriptions", requestBody);
 
             var authenticator = new JwtAuthenticator(_accessToken.Token);
             await authenticator.Authenticate(_apiRestClient, restRequest);
-
-            var jsonData = JsonSerializer.Serialize(requestBody);
-            restRequest.AddParameter("application/json", jsonData, ParameterType.RequestBody);
 
             var response = await _apiRestClient.ExecuteAsync(restRequest);
             return ProcessResponse<AddSubscriptionResponse>(response);
         }
 
-        public async Task<Result<UpdateSubscriptionResponse>> UpdateSubscriptionAsync(UpdateSubscriptionRequest requestBody)
+        public async Task<Result<UpdateSubscriptionResponse>> UpdateSubscriptionAsync(string subscriptionId, UpdateSubscriptionRequest requestBody)
         {
-            if (_accessToken is null)
+            if (_accessToken is null || _accessToken.Token is null)
                 return Result<UpdateSubscriptionResponse>.Error("You must obtain access_token first");
-            throw new NotImplementedException();
+
+            var restRequest = RestHelper.CreateAcceptJsonPutRestRequest($"/dataservices/v1/webhooks/subscriptions/{subscriptionId}", requestBody);
+
+            var authenticator = new JwtAuthenticator(_accessToken.Token);
+            await authenticator.Authenticate(_apiRestClient, restRequest);
+
+            var response = await _apiRestClient.ExecuteAsync(restRequest);
+            return ProcessResponse<UpdateSubscriptionResponse>(response);
         }
 
         public async Task<Result<DeleteSubscriptionResponse>> DeleteSubscriptionAsync(string subscriptionId)
         {
-            if (_accessToken is null)
+            if (_accessToken is null || _accessToken.Token is null)
                 return Result<DeleteSubscriptionResponse>.Error("You must obtain access_token first");
-            throw new NotImplementedException();
+
+            var restRequest = RestHelper.CreateAcceptJsonRestRequest($"/dataservices/v1/webhooks/subscriptions/{subscriptionId}", Method.Delete);
+
+            var authenticator = new JwtAuthenticator(_accessToken.Token);
+            await authenticator.Authenticate(_apiRestClient, restRequest);
+
+            var response = await _apiRestClient.ExecuteAsync(restRequest);
+            return ProcessResponse<DeleteSubscriptionResponse>(response);
         }
 
         public async Task<Result<List<ListSubscriptionsItemResponse>>> ListSubscriptionsAsync()
         {
-            if (_accessToken is null)
+            if (_accessToken is null || _accessToken.Token is null)
                 return Result<List<ListSubscriptionsItemResponse>>.Error("You must obtain access_token first");
-            throw new NotImplementedException();
+
+            var restRequest = RestHelper.CreateAcceptJsonRestRequest("/dataservices/v1/webhooks/subscriptions/", Method.Get);
+
+            var authenticator = new JwtAuthenticator(_accessToken.Token);
+            await authenticator.Authenticate(_apiRestClient, restRequest);
+
+            var response = await _apiRestClient.ExecuteAsync(restRequest);
+            return ProcessResponse<List<ListSubscriptionsItemResponse>>(response);
         }
     }
 }

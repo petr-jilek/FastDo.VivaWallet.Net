@@ -1,4 +1,6 @@
-﻿using FastDo.VivaWallet.Net.Models.Payments;
+﻿using FastDo.VivaWallet.Net.Consts;
+using FastDo.VivaWallet.Net.Models.Payments;
+using FastDo.VivaWallet.Net.Models.Subscriptions;
 using FastDo.VivaWallet.Net.Services;
 using FastDo.VivaWallet.Net.Tests.Mocks;
 
@@ -16,7 +18,7 @@ namespace FastDo.VivaWallet.Net.Tests.IntegrationTests
         }
 
         [Fact]
-        public async Task GetAccessToken_Ok()
+        public async Task GetAccessTokenAsync_Ok()
         {
             var result = await _vivaWalletService.GetAccessTokenAsync();
 
@@ -31,7 +33,7 @@ namespace FastDo.VivaWallet.Net.Tests.IntegrationTests
         }
 
         [Fact]
-        public async Task CreatePaymentOrder_Ok()
+        public async Task CreatePaymentOrderAsync_Ok()
         {
             await _vivaWalletService.GetAccessTokenAsync();
 
@@ -44,9 +46,42 @@ namespace FastDo.VivaWallet.Net.Tests.IntegrationTests
 
             Assert.True(result.Success);
             Assert.NotNull(result.Value);
-            var value = result.Value;
 
+            var value = result.Value;
             Assert.True(value.OrderCode > 0);
+        }
+
+        [Fact]
+        public async Task AddSubscriptionAsync_Ok()
+        {
+            await _vivaWalletService.GetAccessTokenAsync();
+
+            var request = new AddSubscriptionRequest()
+            {
+                Url = "https://www.myapi.com/webhooks/receive",
+                Secret = "mysecret",
+                Events = new List<string> { WebHooks.TransactionPaymentCreated },
+            };
+
+            var result = await _vivaWalletService.AddSubscriptionAsync(request);
+
+            Assert.True(result.Success);
+            Assert.NotNull(result.Value);
+
+            var subscriptionId = result.Value.SubscriptionId;
+
+            var listResult = await _vivaWalletService.ListSubscriptionsAsync();
+
+            Assert.True(listResult.Success);
+            Assert.NotNull(listResult.Value);
+            Assert.Single(listResult.Value);
+
+            Assert.Equal(subscriptionId, listResult.Value.First().SubscriptionId);
+            Assert.Equal(request.Url, listResult.Value.First().SubscriptionId);
+            for (var i = 0; i < request.Events.Count; i++)
+            {
+                Assert.Equal(request.Events[i], listResult.Value.First().Events[i]);
+            }
         }
     }
 }
