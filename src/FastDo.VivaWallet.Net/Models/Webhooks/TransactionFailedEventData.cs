@@ -61,6 +61,6 @@
         public List<string>? AssignedResellerUsers { get; set; }
         public byte CardTypeId { get; set; }
         public int ResponseEventId { get; set; }
-        public int ElectronicCommerceIndicator { get; set; }
+        public int? ElectronicCommerceIndicator { get; set; }
     }
 }
