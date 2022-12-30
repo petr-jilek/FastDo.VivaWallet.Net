@@ -1,6 +1,6 @@
 ﻿namespace FastDo.VivaWallet.Net.Models.Webhooks
 {
-    public class TransactionPaymentCreatedEventData
+    public class TransactionFailedEventData
     {
         public bool Moto { get; set; }
         public string? Email { get; set; }
@@ -47,7 +47,7 @@
         public string? CardCountryCode { get; set; }
         public string? CardIssuingBank { get; set; }
         public decimal RedeemedAmount { get; set; }
-        public int? ClearanceDate { get; set; }
+        public DateTime? ClearanceDate { get; set; }
         public byte CurrentInstallment { get; set; }
         public List<string>? Tags { get; set; }
         public string? BillId { get; set; }
@@ -55,13 +55,12 @@
         public string? ResellerSourceName { get; set; }
         public string? ResellerCompanyName { get; set; }
         public string? ResellerSourceAddress { get; set; }
-        public string? CardExpirationDate { get; set; }
+        public DateTime CardExpirationDate { get; set; }
         public string? RetrievalReferenceNumber { get; set; }
         public List<string>? AssignedMerchantUsers { get; set; }
         public List<string>? AssignedResellerUsers { get; set; }
         public byte CardTypeId { get; set; }
-        public byte? DigitalWalletId { get; set; }
-        public string? ResponseEventId { get; set; }
-        public string? ElectronicCommerceIndicator { get; set; }
+        public int ResponseEventId { get; set; }
+        public int ElectronicCommerceIndicator { get; set; }
     }
 }
