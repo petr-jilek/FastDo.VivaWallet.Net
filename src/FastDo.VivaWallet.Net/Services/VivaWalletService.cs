@@ -5,6 +5,7 @@ using FastDo.VivaWallet.Net.Models.Core;
 using FastDo.VivaWallet.Net.Models.DataServices;
 using FastDo.VivaWallet.Net.Models.Identity;
 using FastDo.VivaWallet.Net.Models.Payments;
+using FastDo.VivaWallet.Net.Models.Wallet;
 using RestSharp;
 using RestSharp.Authenticators;
 
@@ -16,6 +17,7 @@ namespace FastDo.VivaWallet.Net.Services
 
         private readonly RestClient _accountsRestClient;
         private readonly RestClient _apiRestClient;
+        private readonly RestClient _baseRestClient;
 
         private AccessToken? _accessToken;
 
@@ -27,9 +29,12 @@ namespace FastDo.VivaWallet.Net.Services
                 throw new ArgumentNullException(nameof(_settings));
             if (string.IsNullOrEmpty(_settings.ApiBaseUrl))
                 throw new ArgumentNullException(nameof(_settings));
+            if (string.IsNullOrEmpty(_settings.BaseUrl))
+                throw new ArgumentNullException(nameof(_settings));
 
             _accountsRestClient = new RestClient(new Uri(_settings.AccountsBaseUrl));
             _apiRestClient = new RestClient(new Uri(_settings.ApiBaseUrl));
+            _baseRestClient = new RestClient(new Uri(_settings.BaseUrl));
         }
 
         private Result<T> ProcessResponse<T>(RestResponse response)
@@ -123,6 +128,34 @@ namespace FastDo.VivaWallet.Net.Services
 
             var response = await _apiRestClient.ExecuteAsync(restRequest);
             return ProcessResponse<CreateCardTokenResponse>(response);
+        }
+
+        public async Task<Result<BalanceTransferResponse>> BalanceTransferAsync(string walletId, string targetWalletId, BalanceTransferRequest requestBody)
+        {
+            if (_settings.MerchantId is null || _settings.ApiKey is null)
+                return Result<BalanceTransferResponse>.Error("You must set MerchantId and ApiKey first");
+
+            var restRequest = RestHelper.CreateAcceptJsonPostRestRequest($"/api/wallets/{walletId}/balancetransfer/{targetWalletId}", requestBody);
+
+            var authenticator = new HttpBasicAuthenticator(_settings.MerchantId, _settings.ApiKey);
+            await authenticator.Authenticate(_baseRestClient, restRequest);
+
+            var response = await _baseRestClient.ExecuteAsync(restRequest);
+            return ProcessResponse<BalanceTransferResponse>(response);
+        }
+
+        public async Task<Result<RetrieveWalletResponse>> RetrieveWalletAsync()
+        {
+            if (_settings.MerchantId is null || _settings.ApiKey is null)
+                return Result<RetrieveWalletResponse>.Error("You must set MerchantId and ApiKey first");
+
+            var restRequest = RestHelper.CreateAcceptJsonRestRequest("/api/wallets", Method.Get);
+
+            var authenticator = new HttpBasicAuthenticator(_settings.MerchantId, _settings.ApiKey);
+            await authenticator.Authenticate(_baseRestClient, restRequest);
+
+            var response = await _baseRestClient.ExecuteAsync(restRequest);
+            return ProcessResponse<RetrieveWalletResponse>(response);
         }
 
         public async Task<Result<AddSubscriptionResponse>> AddSubscriptionAsync(AddSubscriptionRequest requestBody)
