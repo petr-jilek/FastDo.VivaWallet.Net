@@ -1,6 +1,4 @@
-﻿using FastDo.VivaWallet.Net.Consts;
-using FastDo.VivaWallet.Net.Models.Payments;
-using FastDo.VivaWallet.Net.Models.Subscriptions;
+﻿using FastDo.VivaWallet.Net.Models.Payments;
 using FastDo.VivaWallet.Net.Services;
 using FastDo.VivaWallet.Net.Tests.Mocks;
 
@@ -51,37 +49,37 @@ namespace FastDo.VivaWallet.Net.Tests.IntegrationTests
             Assert.True(value.OrderCode > 0);
         }
 
-        [Fact(Skip = "Not finished")]
-        public async Task AddSubscriptionAsync_Ok()
-        {
-            await _vivaWalletService.GetAccessTokenAsync();
+        //[Fact(Skip = "Not finished")]
+        //public async Task AddSubscriptionAsync_Ok()
+        //{
+        //    await _vivaWalletService.GetAccessTokenAsync();
 
-            var request = new AddSubscriptionRequest()
-            {
-                Url = "https://www.myapi.com/webhooks/receive",
-                Secret = "mysecret",
-                Events = new List<string> { WebHooks.TransactionPaymentCreated },
-            };
+        //    var request = new AddSubscriptionRequest()
+        //    {
+        //        Url = "https://www.myapi.com/webhooks/receive",
+        //        Secret = "mysecret",
+        //        Events = new List<string> { WebHooks.TransactionPaymentCreated },
+        //    };
 
-            var result = await _vivaWalletService.AddSubscriptionAsync(request);
+        //    var result = await _vivaWalletService.AddSubscriptionAsync(request);
 
-            Assert.True(result.Success);
-            Assert.NotNull(result.Value);
+        //    Assert.True(result.Success);
+        //    Assert.NotNull(result.Value);
 
-            var subscriptionId = result.Value.SubscriptionId;
+        //    var subscriptionId = result.Value.SubscriptionId;
 
-            var listResult = await _vivaWalletService.ListSubscriptionsAsync();
+        //    var listResult = await _vivaWalletService.ListSubscriptionsAsync();
 
-            Assert.True(listResult.Success);
-            Assert.NotNull(listResult.Value);
-            Assert.Single(listResult.Value);
+        //    Assert.True(listResult.Success);
+        //    Assert.NotNull(listResult.Value);
+        //    Assert.Single(listResult.Value);
 
-            Assert.Equal(subscriptionId, listResult.Value.First().SubscriptionId);
-            Assert.Equal(request.Url, listResult.Value.First().SubscriptionId);
-            for (var i = 0; i < request.Events.Count; i++)
-            {
-                Assert.Equal(request.Events[i], listResult.Value.First().Events[i]);
-            }
-        }
+        //    Assert.Equal(subscriptionId, listResult.Value.First().SubscriptionId);
+        //    Assert.Equal(request.Url, listResult.Value.First().SubscriptionId);
+        //    for (var i = 0; i < request.Events.Count; i++)
+        //    {
+        //        Assert.Equal(request.Events[i], listResult.Value.First().Events[i]);
+        //    }
+        //}
     }
 }

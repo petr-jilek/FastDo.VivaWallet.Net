@@ -1,8 +1,7 @@
 ﻿using FastDo.VivaWallet.Net.Models.Core;
+using FastDo.VivaWallet.Net.Models.DataServices;
 using FastDo.VivaWallet.Net.Models.Identity;
 using FastDo.VivaWallet.Net.Models.Payments;
-using FastDo.VivaWallet.Net.Models.Subscriptions;
-using FastDo.VivaWallet.Net.Models.Transactions;
 
 namespace FastDo.VivaWallet.Net.Services
 {

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FastDo.VivaWallet.Net.Models.Subscriptions
+namespace FastDo.VivaWallet.Net.Models.DataServices
 {
     public class DeleteSubscriptionResponse
     {

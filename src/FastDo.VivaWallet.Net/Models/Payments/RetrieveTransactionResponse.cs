@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FastDo.VivaWallet.Net.Models.Transactions
+namespace FastDo.VivaWallet.Net.Models.Payments
 {
     public class RetrieveTransactionResponse
     {

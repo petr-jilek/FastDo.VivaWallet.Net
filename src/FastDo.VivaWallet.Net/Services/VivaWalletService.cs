@@ -2,10 +2,9 @@
 using System.Text.Json;
 using FastDo.VivaWallet.Net.Helpers;
 using FastDo.VivaWallet.Net.Models.Core;
+using FastDo.VivaWallet.Net.Models.DataServices;
 using FastDo.VivaWallet.Net.Models.Identity;
 using FastDo.VivaWallet.Net.Models.Payments;
-using FastDo.VivaWallet.Net.Models.Subscriptions;
-using FastDo.VivaWallet.Net.Models.Transactions;
 using RestSharp;
 using RestSharp.Authenticators;
 
