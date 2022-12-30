@@ -23,11 +23,11 @@
         public string? CardToken { get; set; }
         public string? CardUniqueReference { get; set; }
         public string? CardNumber { get; set; }
-        public int TipAmount { get; set; }
+        public decimal TipAmount { get; set; }
         public string? SourceCode { get; set; }
         public string? SourceName { get; set; }
-        public decimal Latitude { get; set; }
-        public decimal Longitude { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
         public string? CompanyName { get; set; }
         public string? TransactionId { get; set; }
         public string? CompanyTitle { get; set; }
@@ -45,8 +45,8 @@
         public byte TotalInstallments { get; set; }
         public string? CardCountryCode { get; set; }
         public string? CardIssuingBank { get; set; }
-        public int RedeemedAmount { get; set; }
-        public int ClearanceDate { get; set; }
+        public decimal RedeemedAmount { get; set; }
+        public int? ClearanceDate { get; set; }
         public byte CurrentInstallment { get; set; }
         public List<string>? Tags { get; set; }
         public string? BillId { get; set; }
@@ -59,7 +59,7 @@
         public List<string>? AssignedMerchantUsers { get; set; }
         public List<string>? AssignedResellerUsers { get; set; }
         public byte CardTypeId { get; set; }
-        public byte DigitalWalletId { get; set; }
+        public byte? DigitalWalletId { get; set; }
         public string? ResponseEventId { get; set; }
         public string? ElectronicCommerceIndicator { get; set; }
     }
