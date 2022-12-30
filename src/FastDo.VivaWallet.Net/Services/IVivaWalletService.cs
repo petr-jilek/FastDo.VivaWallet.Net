@@ -2,6 +2,7 @@
 using FastDo.VivaWallet.Net.Models.Identity;
 using FastDo.VivaWallet.Net.Models.Payments;
 using FastDo.VivaWallet.Net.Models.Subscriptions;
+using FastDo.VivaWallet.Net.Models.Transactions;
 
 namespace FastDo.VivaWallet.Net.Services
 {
@@ -9,6 +10,8 @@ namespace FastDo.VivaWallet.Net.Services
     {
         Task<Result<AccessToken>> GetAccessTokenAsync();
         Task<Result<CreatePaymentOrderResponse>> CreatePaymentOrderAsync(CreatePaymentOrderRequest requestBody);
+        Task<Result<RetrieveTransactionResponse>> RetrieveTransactionAsync(string transactionId);
+        Task<Result<CreateCardTokenResponse>> CreateCardTokenAsync(CreateCardTokenRequest requestBody);
         Task<Result<AddSubscriptionResponse>> AddSubscriptionAsync(AddSubscriptionRequest requestBody);
         Task<Result<UpdateSubscriptionResponse>> UpdateSubscriptionAsync(string subscriptionId, UpdateSubscriptionRequest requestBody);
         Task<Result<DeleteSubscriptionResponse>> DeleteSubscriptionAsync(string subscriptionId);

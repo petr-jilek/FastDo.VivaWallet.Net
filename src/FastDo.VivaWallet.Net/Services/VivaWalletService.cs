@@ -1,11 +1,11 @@
 ﻿using System.Net;
 using System.Text.Json;
-using System.Xml;
 using FastDo.VivaWallet.Net.Helpers;
 using FastDo.VivaWallet.Net.Models.Core;
 using FastDo.VivaWallet.Net.Models.Identity;
 using FastDo.VivaWallet.Net.Models.Payments;
 using FastDo.VivaWallet.Net.Models.Subscriptions;
+using FastDo.VivaWallet.Net.Models.Transactions;
 using RestSharp;
 using RestSharp.Authenticators;
 
@@ -96,6 +96,34 @@ namespace FastDo.VivaWallet.Net.Services
 
             var response = await _apiRestClient.ExecuteAsync(restRequest);
             return ProcessResponse<CreatePaymentOrderResponse>(response);
+        }
+
+        public async Task<Result<RetrieveTransactionResponse>> RetrieveTransactionAsync(string transactionId)
+        {
+            if (_accessToken is null || _accessToken.Token is null)
+                return Result<RetrieveTransactionResponse>.Error("You must obtain access_token first");
+
+            var restRequest = RestHelper.CreateAcceptJsonRestRequest($"/checkout/v2/transactions/{transactionId}", Method.Get);
+
+            var authenticator = new JwtAuthenticator(_accessToken.Token);
+            await authenticator.Authenticate(_apiRestClient, restRequest);
+
+            var response = await _apiRestClient.ExecuteAsync(restRequest);
+            return ProcessResponse<RetrieveTransactionResponse>(response);
+        }
+
+        public async Task<Result<CreateCardTokenResponse>> CreateCardTokenAsync(CreateCardTokenRequest requestBody)
+        {
+            if (_accessToken is null || _accessToken.Token is null)
+                return Result<CreateCardTokenResponse>.Error("You must obtain access_token first");
+
+            var restRequest = RestHelper.CreateAcceptJsonPostRestRequest("/acquiring/v1/cards/tokens", requestBody);
+
+            var authenticator = new JwtAuthenticator(_accessToken.Token);
+            await authenticator.Authenticate(_apiRestClient, restRequest);
+
+            var response = await _apiRestClient.ExecuteAsync(restRequest);
+            return ProcessResponse<CreateCardTokenResponse>(response);
         }
 
         public async Task<Result<AddSubscriptionResponse>> AddSubscriptionAsync(AddSubscriptionRequest requestBody)

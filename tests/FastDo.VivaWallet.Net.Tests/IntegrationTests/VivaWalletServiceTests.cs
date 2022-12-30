@@ -51,7 +51,7 @@ namespace FastDo.VivaWallet.Net.Tests.IntegrationTests
             Assert.True(value.OrderCode > 0);
         }
 
-        [Fact]
+        [Fact(Skip = "Not finished")]
         public async Task AddSubscriptionAsync_Ok()
         {
             await _vivaWalletService.GetAccessTokenAsync();
