@@ -28,5 +28,22 @@ namespace FastDo.VivaWallet.Net.Extensions
             services.AddScoped<IVivaWalletService, VivaWalletService>();
             return services;
         }
+
+        public static IServiceCollection AddVivaWalletAdditionalSettings(this IServiceCollection services, VivaWalletAdditionalSettings settings)
+        {
+            if (settings.IsAnyStringNullOrEmpty())
+                throw new ArgumentNullException(typeof(VivaWalletAdditionalSettings).Name);
+
+            services.AddSingleton(settings);
+            return services;
+        }
+
+        public static IServiceCollection AddVivaWalletAdditionalSettings(this IServiceCollection services, IConfiguration configurations)
+        {
+            var settings = new VivaWalletAdditionalSettings();
+            configurations.GetSection(typeof(VivaWalletAdditionalSettings).Name).Bind(settings);
+
+            return services.AddVivaWalletAdditionalSettings(settings);
+        }
     }
 }
