@@ -63,6 +63,12 @@ namespace FastDo.VivaWallet.Net.Services
             }
         }
 
+        public Result<string> GetPaymentUrl(long orderCode, string color)
+        {
+            var result = $"{_settings.BaseUrl}/web2?ref={orderCode}&color={color}";
+            return Result<string>.Ok(result);
+        }
+
         public async Task<Result<AccessToken>> GetAccessTokenAsync()
         {
             var restRequest = new RestRequest(@"/connect/token", Method.Post)

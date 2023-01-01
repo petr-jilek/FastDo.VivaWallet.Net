@@ -8,6 +8,7 @@ namespace FastDo.VivaWallet.Net.Services
 {
     public interface IVivaWalletService
     {
+        Result<string> GetPaymentUrl(long orderCode, string color);
         Task<Result<AccessToken>> GetAccessTokenAsync();
         Task<Result<CreatePaymentOrderResponse>> CreatePaymentOrderAsync(CreatePaymentOrderRequest requestBody);
         Task<Result<RetrieveTransactionResponse>> RetrieveTransactionAsync(string transactionId);
